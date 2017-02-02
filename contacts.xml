@@ -1,77 +1,55 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--<!DOCTYPE contacts SYSTEM "contacts.dtd">-->
 <?xml-stylesheet type="text/xsl" href="contacts.xsl"?>
 <contacts>
-	<employee>
-		<name>madonna</name>
-		<phones>
-			<phone Type="home">0482580707</phone>
-			<phone Type="mobile">01222619347</phone>
-		</phones>
-		<addresses>
-			<address>
-				<street>sabry</street>
-				<buldingNumber>1</buldingNumber>
-				<region>menofia</region>
-				<city>quesna</city>
-				<country>egypt</country>
-			</address>
-			<address>
-				<street>fo2ad</street>
-				<buldingNumber>1</buldingNumber>
-				<region>alex</region>
-				<city>alex</city>
-				<country>egypt</country>
-			</address>
-		</addresses>
-		<mail>mado@yahoo.com</mail>
-	</employee>
-	<employee>
-		<name>deroo</name>
-		<phones>
-			<phone Type="home">0482588807</phone>
-			<phone Type="mobile">01277777</phone>
-		</phones>
-		<addresses>
-			<address>
-				<street>fo2ad</street>
-				<buldingNumber>4</buldingNumber>
-				<region>alex</region>
-				<city>alex</city>
-				<country>egypt</country>
-			</address>
-			<address>
-				<street>fo2ad</street>
-				<buldingNumber>1</buldingNumber>
-				<region>alex</region>
-				<city>alex</city>
-				<country>egypt</country>
-			</address>
-		</addresses>
-		<mail>deroooo@yahoo.com</mail>
-	</employee>
-	<employee>
-		<name>ahmed</name>
-		<phones>
-			<phone Type="home">0482588807</phone>
-			<phone Type="mobile">01277777</phone>
-		</phones>
-		<addresses>
-			<address>
-				<street>fo2ad</street>
-				<buldingNumber>4</buldingNumber>
-				<region>alex</region>
-				<city>alex</city>
-				<country>egypt</country>
-			</address>
-			<address>
-				<street>fo2ad</street>
-				<buldingNumber>1</buldingNumber>
-				<region>alex</region>
-				<city>alex</city>
-				<country>egypt</country>
-			</address>
-		</addresses>
-		<mail>deroooo@yahoo.com</mail>
-	</employee>
+  <employee>
+    <name>madonna</name>
+    <phones>
+      <phone Type="home">0482580707</phone>
+      <phone Type="mobile">01222619347</phone>
+      <phone Type="home">0482580707</phone>
+      <phone Type="mobile">01222619347</phone>
+    </phones>
+    <addresses>
+      <address>
+        <street>tanees</street>
+        <buldingNumber>1</buldingNumber>
+        <region>b7era</region>
+        <city>quesna</city>
+        <country>egypt</country>
+      </address>
+      <address>
+        <street>sabry</street>
+        <buldingNumber>1</buldingNumber>
+        <region>alex</region>
+        <city>alex</city>
+        <country>egypt</country>
+      </address>
+    </addresses>
+    <mail>mado@yahoo.com</mail>
+  </employee>
+  <employee>
+    <name>deroo</name>
+    <phones>
+      <phone Type="home">0482588807</phone>
+      <phone Type="mobile">01277777</phone>
+    </phones>
+    <addresses>
+      <address>
+        <street>fo2ad</street>
+        <buldingNumber>4</buldingNumber>
+        <region>alex</region>
+        <city>alex</city>
+        <country>egypt</country>
+      </address>
+      <address>
+        <street>fo2ad</street>
+        <buldingNumber>1</buldingNumber>
+        <region>alex</region>
+        <city>alex</city>
+        <country>egypt</country>
+      </address>
+    </addresses>
+    <mail>deroooo@yahoo.com</mail>
+  </employee>
 </contacts>

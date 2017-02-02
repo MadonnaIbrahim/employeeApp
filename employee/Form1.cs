@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,27 +9,44 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-
 namespace employee
 {
     public partial class Form1 : Form
     {
 		int j;
-		XmlNodeList street_list ;
-		XmlNodeList no_list ;
-		XmlNodeList region_list ;
-		XmlNodeList city_list ;
-		XmlNodeList country_list;
-		XmlNodeList mobile_list;
-		XmlNodeList home_list;
+		XmlNodeList phone_list ;
+		XmlNodeList phones_list ;
 		XmlNodeList name_list;
 		XmlNodeList mail_list;
 		XmlNodeList all;
+		XmlNodeList addresses_list;
 		XmlDocument doc;
+		XmlNodeList address_list;
+		XmlElement root;
+		int index;
+		string flag;
 		string path = @"G:\ITI\xml\labs\employee\employee\contacts.xml";
+		XmlElement employee ;
+		XmlElement name ;
+		XmlElement phones ;
+		XmlElement phone;
+		XmlAttribute Type;
+		XmlElement addresses ;
+		XmlElement address ;
+		XmlElement street ;
+		XmlElement buildingNumber ;
+		XmlElement region ;
+		XmlElement city ;
+		XmlElement country ;
+		XmlElement mail ;
+		XmlNodeList phones_insert;
+
 		public Form1()
         {
             InitializeComponent();
+			doc = new XmlDocument();
+			doc.Load(path);
+			root = doc.DocumentElement;
 			j = 0;
 
         }
@@ -43,6 +61,10 @@ namespace employee
 				{
 					button_prev.Enabled = false;
 				}
+				if (j < name_list.Count - 1)
+				{
+					button_next.Enabled = true;
+				}
 				fill_function();
 			}
 			
@@ -50,8 +72,7 @@ namespace employee
 
         private void Form1_Load(object sender, EventArgs e)
         {
-		     doc = new XmlDocument();
-			doc.Load(path);
+		    
 			fill_function();
 			if (j == 0)
 			{
@@ -66,19 +87,25 @@ namespace employee
 		public void empty_form()
 		{
 			//
+			listBox_street.Items.Clear();
 			listBox_city.Items.Clear();
 			listBox_region.Items.Clear();
 			listBox_no.Items.Clear();
-			listBox_counry.Items.Clear();
+			listBox_country.Items.Clear();
 			listBox_city.Items.Clear();
 			listBox_home.Items.Clear();
 			listBox_mobile.Items.Clear();
 		}
 		private void button_next_Click(object sender, EventArgs e)
 		{
+			
 			button_prev.Enabled = true;
 			empty_form();
 			j++;
+			if (j == (name_list.Count - 1))
+			{
+				button_next.Enabled = false;
+			}
 			fill_function();
 			Refresh();
 			
@@ -86,25 +113,37 @@ namespace employee
 
 		public void fill_function()
 		{
+			phones_list = doc.GetElementsByTagName("phones");
+			phone_list = phones_list[j].ChildNodes;
+
+			for (int i = 0; i < phone_list.Count; i++)
+			{
+				if (phone_list[i].Attributes[0].Value == "home")
+				{
+					listBox_home.Items.Add(phone_list[i].InnerText);
+				}
+				else if (phone_list[i].Attributes[0].Value == "mobile")
+				{
+					listBox_mobile.Items.Add(phone_list[i].InnerText);
+				}
+			}
+
+			addresses_list = doc.GetElementsByTagName("addresses");
+			address_list = addresses_list[j].ChildNodes;
+
+			for (int i = 0; i < address_list.Count; i++)
+			{
+				listBox_street.Items.Add(address_list[i].ChildNodes[0].InnerText);
+				listBox_no.Items.Add(address_list[i].ChildNodes[1].InnerText);
+				listBox_region.Items.Add(address_list[i].ChildNodes[2].InnerText);
+				listBox_city.Items.Add(address_list[i].ChildNodes[3].InnerText);
+				listBox_country.Items.Add(address_list[i].ChildNodes[4].InnerText);
+			}
+
 		    name_list = doc.GetElementsByTagName("name");
 			textBox_name.Text = name_list[j].InnerText;
-		    home_list = doc.SelectNodes("/contacts/employee/phones/phone[@Type='home']");
-			listBox_home.Items.Add(home_list[j].InnerText);
 
-			 mobile_list = doc.SelectNodes("/contacts/employee/phones/phone[@Type='mobile']");
-			listBox_mobile.Items.Add(mobile_list[j].InnerText);
-
-		     street_list = doc.GetElementsByTagName("street");
-             no_list = doc.GetElementsByTagName("buldingNumber");
-			 region_list = doc.GetElementsByTagName("region");
-			 city_list = doc.GetElementsByTagName("city");
-			 country_list = doc.GetElementsByTagName("country");
-			listBox_street.Items.Add(street_list[j].InnerText);
-			listBox_no.Items.Add(no_list[j].InnerText);
-			listBox_region.Items.Add(region_list[j].InnerText);
-			listBox_city.Items.Add(city_list[j].InnerText);
-			listBox_counry.Items.Add(country_list[j].InnerText);
-
+		 
 
 			 mail_list = doc.GetElementsByTagName("mail");
 			textBox_mail.Text = mail_list[j].InnerText;
@@ -114,12 +153,439 @@ namespace employee
 		{
 			//delete_button
 			all = doc.GetElementsByTagName("employee");
-			XmlElement root = doc.DocumentElement;
+		     root = doc.DocumentElement;
 			root.RemoveChild(all[j]);
 			j--;
 			empty_form();
 			fill_function();
 			doc.Save(path);
 		}
+
+		private void button_insert_Click(object sender, EventArgs e)
+		{
+			int new_place = (all.Count)-1;
+			XmlNode employee = doc.CreateElement("employee");
+			//XmlElement employee=doc.cr
+
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			switch (flag)
+			{
+				
+
+			}
+			doc.Save(path);
+		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			if (button_update.Text == "update")
+			{
+				textBox_edit.Visible = true;
+				label_edit.Visible = true;
+				button_done.Visible = true;
+				textBox_name.ReadOnly = false;
+				textBox_mail.ReadOnly = false;
+				button_update.Text = Text = "Save";
+				button_cancel.Visible = true;
+				this.button_update.Location = new System.Drawing.Point(265, 310);
+				button_cancel.Location = new System.Drawing.Point(140, 310);
+			}
+
+			else if (button_update.Text == "Cancel")
+			{
+				
+
+			}
+		}
+
+		private void button_done_Click(object sender, EventArgs e)
+		{
+			switch (flag)
+			{
+				case ("street"):
+					listBox_street.Items[index] = textBox_edit.Text;
+					listBox_street.SelectedIndex = listBox_street.Items.IndexOf(textBox_edit.Text);
+					//listBox_street.Refresh();
+					break;
+				case ("region"):
+					listBox_region.Items[0] = textBox_edit.Text;
+					textBox_edit.Text = "";
+					break;
+			}
+		}
+
+		private void listBox_street_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (flag != "street")
+			{
+				flag = "street";
+				textBox_edit.Text = listBox_street.SelectedItem.ToString();
+				index = listBox_street.SelectedIndex;
+				//textBox_edit.Text = listBox_street.Items[index].ToString();
+				
+			}
+		}
+
+		private void listBox_no_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			flag = "bulding_no";
+			textBox_edit.Text = listBox_no.SelectedItem.ToString();
+
+		}
+
+		private void listBox_region_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			flag = "region";
+			textBox_edit.Text = listBox_region.SelectedItem.ToString();
+		
+		}
+
+		private void listBox_city_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			flag = "city";
+			textBox_edit.Text = listBox_city.SelectedItem.ToString();
+		}
+
+		private void listBox_country_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			flag = "country";
+			textBox_edit.Text = listBox_country.SelectedItem.ToString();
+		}
+
+		private void listBox_mobile_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			flag = "mobile";
+			textBox_edit.Text = listBox_mobile.SelectedItem.ToString();
+		}
+
+		private void listBox_home_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			flag = "home";
+			textBox_edit.Text = listBox_home.SelectedItem.ToString();
+		}
+
+		private void button_cancel_Click(object sender, EventArgs e)
+		{
+			button_update.Text = "update";
+			button_cancel.Visible = false;
+			button_update.Location = new System.Drawing.Point(200, 310);
+			textBox_name.ReadOnly = true;
+			textBox_mail.ReadOnly = true;
+			textBox_edit.Visible = false;
+			label_edit.Visible = false;
+			button_done.Visible = false;
+		}
+
+		private void button_insert_Click_1(object sender, EventArgs e)
+		{
+		
+			panel_insert.Visible = true;
+			if (button_insert.Text == "insert")
+			{
+				button_update.Enabled = false;
+				button_search.Enabled = false;
+				button_prev.Enabled = false;
+				button_next.Enabled = false;
+				button_del.Enabled = false;
+				button_insert.Text = "Save";
+				textBox_name.Text = "";
+				textBox_mail.Text = "";
+				textBox_name.ReadOnly = false;
+				textBox_mail.ReadOnly = false;
+
+				employee = doc.CreateElement("employee");
+				name = doc.CreateElement("name");
+				phones = doc.CreateElement("phones");
+				phone = doc.CreateElement("phone");
+				Type = doc.CreateAttribute("Type");
+				addresses = doc.CreateElement("addresses");
+				address = doc.CreateElement("address");
+				street = doc.CreateElement("street");
+				buildingNumber = doc.CreateElement("buldingNumber");
+				region = doc.CreateElement("region");
+				city = doc.CreateElement("city");
+				country = doc.CreateElement("country");
+				mail = doc.CreateElement("mail");
+
+				//name.InnerText = textBox_name.Text;
+				//street.InnerText = richTextBox_street.Text;
+				//region.InnerText = richTextBox_region.Text;
+				//buildingNumber.InnerText = richTextBox_no.Text;
+				//city.InnerText = richTextBox_city.Text;
+				//country.InnerText = richTextBox_country.Text;
+				//mail.InnerText = textBox_mail.Text;
+				//phone.Attributes.Append(Type);
+
+			}
+			else
+			{
+				button_update.Enabled = true;
+				button_search.Enabled = true;
+				button_prev.Enabled = true;
+				button_next.Enabled = true;
+				button_del.Enabled = true;
+				
+				root.AppendChild(employee);
+				employee.AppendChild(name);
+				if (textBox_name.Text !="")
+				{
+					name.InnerText = textBox_name.Text;
+				}
+				else
+				{
+					name.InnerText = "no_name";
+				}
+
+				employee.AppendChild(phones);
+				
+				if (textBox_home.Text != "")
+				{
+					phone = doc.CreateElement("phone");
+					Type = doc.CreateAttribute("Type");
+					phones.AppendChild(phone);
+					phone.InnerText = textBox_home.Text;
+					Type.InnerText = "home";
+					phone.Attributes.Append(Type);
+				}
+				else
+				{
+					phones.AppendChild(phone);
+					phone.InnerText = "-";
+					Type.InnerText = "home";
+					phone.Attributes.Append(Type);
+				}
+
+				if (textBox_mobile.Text != "")
+				{
+					phone = doc.CreateElement("phone");
+					Type = doc.CreateAttribute("Type");
+					phones.AppendChild(phone);
+					phone.InnerText = textBox_mobile.Text;
+					Type.InnerText = "mobile";
+					phone.Attributes.Append(Type);
+				}
+				else
+				{
+					phone = doc.CreateElement("phone");
+					Type = doc.CreateAttribute("Type");
+					phones.AppendChild(phone);
+					phone.InnerText = "-";
+					Type.InnerText = "mobile";
+					phone.Attributes.Append(Type);
+				}
+
+				employee.AppendChild(addresses);
+				address = doc.CreateElement("address");
+				addresses.AppendChild(address);
+				if (richTextBox_street.Text != "")
+				{
+					street = doc.CreateElement("street");
+					street.InnerText = richTextBox_street.Text;
+				}
+				else
+				{
+					street = doc.CreateElement("street");
+					street.InnerText = "_";
+				}
+				if (richTextBox_region.Text != "")
+				{
+					region = doc.CreateElement("region");
+					region.InnerText = richTextBox_region.Text;
+				}
+				else
+				{
+					region = doc.CreateElement("region");
+					region.InnerText = "_";
+				}
+				if (richTextBox_no.Text != "")
+				{
+					buildingNumber = doc.CreateElement("buldingNo");
+					buildingNumber.InnerText = richTextBox_no.Text;
+				}
+				else
+				{
+					buildingNumber = doc.CreateElement("buldingNo");
+					buildingNumber.InnerText = "_";
+				}
+				if (richTextBox_city.Text != "")
+				{
+					city = doc.CreateElement("city");
+					city.InnerText = richTextBox_city.Text;
+				}
+				else
+				{
+					city = doc.CreateElement("city");
+					city.InnerText = "_";
+				}
+				if (richTextBox_country.Text != "")
+				{
+					country = doc.CreateElement("country");
+					country.InnerText = richTextBox_country.Text;
+				}
+				else
+				{
+					country = doc.CreateElement("country");
+					country.InnerText = "_";
+				}
+
+				address.AppendChild(street);
+				address.AppendChild(buildingNumber);
+				address.AppendChild(region);
+				address.AppendChild(city);
+				address.AppendChild(country);
+
+				employee.AppendChild(mail);
+				if (textBox_mail.Text != "")
+				{
+					mail.InnerText = textBox_mail.Text;
+				}
+				else
+				{
+					mail.InnerText = "-";
+				}
+
+				doc.Save(path);
+				panel_insert.Visible = false;
+				listBox_city.Items.Clear();
+				listBox_country.Items.Clear();
+				listBox_mobile.Items.Clear();
+				listBox_home.Items.Clear();
+				listBox_no.Items.Clear();
+				listBox_region.Items.Clear();
+				listBox_street.Items.Clear();
+				j = name_list.Count-1;
+				fill_function();
+				button_insert.Text = "insert";
+				button_next.Enabled = false;
+
+			}
+
+		}
+
+		private void button_phone_Click(object sender, EventArgs e)
+		{
+
+			if (textBox_home.Text != "")
+			{
+				phone = doc.CreateElement("phone");
+				Type = doc.CreateAttribute("Type");
+				phones.AppendChild(phone);
+				phone.InnerText = textBox_home.Text;
+				Type.InnerText = "home";
+				phone.Attributes.Append(Type);
+			}
+			else
+			{
+				phone = doc.CreateElement("phone");
+				Type = doc.CreateAttribute("Type");
+				phones.AppendChild(phone);
+				
+				phone.InnerText = "-";
+				Type.InnerText = "home";
+				phone.Attributes.Append(Type);
+			}
+
+			if (textBox_mobile.Text != "")
+			{
+				phone = doc.CreateElement("phone");
+				Type = doc.CreateAttribute("Type");
+				phones.AppendChild(phone);
+				
+				phone.InnerText = textBox_mobile.Text;
+				Type.InnerText = "mobile";
+				phone.Attributes.Append(Type);
+			}
+			else
+			{
+				phone = doc.CreateElement("phone");
+				Type = doc.CreateAttribute("Type");
+				phones.AppendChild(phone);
+				phone.InnerText = "-";
+				Type.InnerText = "mobile";
+				phone.Attributes.Append(Type);
+			}
+
+			textBox_home.Text = "";
+			textBox_mobile.Text = "";
+		}
+
+		private void button_address_Click(object sender, EventArgs e)
+		{
+			address = doc.CreateElement("address");
+			
+			
+			if (richTextBox_street.Text != "")
+			{
+				street = doc.CreateElement("street");
+				street.InnerText = richTextBox_street.Text;
+				address.AppendChild(street);
+			}
+			else
+			{
+				street = doc.CreateElement("street");
+				street.InnerText = "_";
+				address.AppendChild(street);
+			}
+			if (richTextBox_region.Text != "")
+			{
+				region = doc.CreateElement("region");
+				region.InnerText = richTextBox_region.Text;
+				address.AppendChild(region);
+			}
+			else
+			{
+				region = doc.CreateElement("region"); 
+				region.InnerText = "_";
+				address.AppendChild(region);
+			}
+			if (richTextBox_no.Text != "")
+			{
+				buildingNumber = doc.CreateElement("buldingNumber");
+				buildingNumber.InnerText = richTextBox_no.Text;
+				address.AppendChild(buildingNumber);
+			}
+			else
+			{
+				buildingNumber = doc.CreateElement("buldingNumber");
+				buildingNumber.InnerText = "_";
+				address.AppendChild(buildingNumber);
+			}
+			if (richTextBox_city.Text != "")
+			{
+				city = doc.CreateElement("city");
+				city.InnerText = richTextBox_city.Text;
+				address.AppendChild(city);
+			}
+			else
+			{
+				city = doc.CreateElement("city"); 
+				city.InnerText = "_";
+				address.AppendChild(city);
+			}
+			if (richTextBox_country.Text != "")
+			{
+				country = doc.CreateElement("country");
+				country.InnerText = richTextBox_country.Text;
+				address.AppendChild(country);
+			}
+			else
+			{
+				country = doc.CreateElement("country");
+				country.InnerText = "_";
+				address.AppendChild(country);
+			}
+			addresses.AppendChild(address);
+			richTextBox_street.Text = "";
+			richTextBox_no.Text = "";
+			richTextBox_region.Text = "";
+			richTextBox_city.Text = "";
+			richTextBox_country.Text = "";
+		}
 	}
 }
+
+
+
