@@ -9,6 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Xsl;
+using System.Xml.XmlConfiguration;
+using System.IO;
+using System.Data.SqlClient;
+using System.Data.Sql;
+using System.Data.SqlTypes;
 namespace employee
 {
     public partial class Form1 : Form
@@ -25,8 +31,9 @@ namespace employee
 		XmlElement root;
 		int index;
 		string flag;
-		string path = @"G:\ITI\xml\labs\employee\employee\contacts.xml";
+		string path = "contacts.xml";
 		XmlElement employee ;
+        XmlAttribute emp_id;
 		XmlElement name ;
 		XmlElement phones ;
 		XmlElement phone;
@@ -39,7 +46,6 @@ namespace employee
 		XmlElement city ;
 		XmlElement country ;
 		XmlElement mail ;
-		XmlNodeList phones_insert;
 
 		public Form1()
         {
@@ -47,9 +53,10 @@ namespace employee
 			doc = new XmlDocument();
 			doc.Load(path);
 			root = doc.DocumentElement;
-			j = 0;
+            j = 0;
 
         }
+
 
 		private void button_prev_Click(object sender, EventArgs e)
 		{
@@ -149,35 +156,36 @@ namespace employee
 			textBox_mail.Text = mail_list[j].InnerText;
 		}
 
+		
+
 		private void button_del_Click(object sender, EventArgs e)
 		{
-			//delete_button
-			all = doc.GetElementsByTagName("employee");
-		     root = doc.DocumentElement;
-			root.RemoveChild(all[j]);
-			j--;
-			empty_form();
-			fill_function();
-			doc.Save(path);
+            //delete_button
+            if (j > 0)
+            {
+                all = doc.GetElementsByTagName("employee");
+                root = doc.DocumentElement;
+                root.RemoveChild(all[j]);
+                j--;
+                empty_form();
+                fill_function();
+                doc.Save(path);
+            }
+            else
+            {
+
+                all = doc.GetElementsByTagName("employee");
+                root = doc.DocumentElement;
+                root.RemoveChild(all[j]);
+                j=1;
+                empty_form();
+                fill_function();
+                doc.Save(path);
+            }
+
 		}
 
-		private void button_insert_Click(object sender, EventArgs e)
-		{
-			int new_place = (all.Count)-1;
-			XmlNode employee = doc.CreateElement("employee");
-			//XmlElement employee=doc.cr
-
-		}
-
-		private void button2_Click(object sender, EventArgs e)
-		{
-			switch (flag)
-			{
-				
-
-			}
-			doc.Save(path);
-		}
+		
 
 		private void button1_Click(object sender, EventArgs e)
 		{
@@ -188,18 +196,79 @@ namespace employee
 				button_done.Visible = true;
 				textBox_name.ReadOnly = false;
 				textBox_mail.ReadOnly = false;
-				button_update.Text = Text = "Save";
+                button_update.Text = Text = "Save";
 				button_cancel.Visible = true;
+                button_next.Enabled = false;
+                button_prev.Enabled = false;
+                button_search.Enabled = false;
+                button_insert.Enabled = false;
+                button_del.Enabled = false;
 				this.button_update.Location = new System.Drawing.Point(265, 310);
 				button_cancel.Location = new System.Drawing.Point(140, 310);
 			}
 
-			else if (button_update.Text == "Cancel")
+			else if (button_update.Text == "Save")
 			{
-				
+                textBox_name.ReadOnly = true;
+                textBox_mail.ReadOnly = true;
+                textBox_edit.Visible = false;
+                label_edit.Visible = false;
+                button_done.Visible = false;
+                this.button_update.Location = new System.Drawing.Point(200, 310);
+                button_cancel.Visible = false;
+                button_update.Text = "update";
+                button_next.Enabled = true;
+                button_prev.Enabled = true;
+                button_search.Enabled =true;
+                button_insert.Enabled = true;
+                button_del.Enabled = true;
+                name_list[j].InnerText = textBox_name.Text;
+                mail_list[j].InnerText = textBox_mail.Text;
+                phones_list = doc.GetElementsByTagName("phones");
+                phone_list = phones_list[j].ChildNodes;
+                phones_list[j].RemoveAll();
+                addresses_list = doc.GetElementsByTagName("addresses");
+                address_list = addresses_list[j].ChildNodes;
+                addresses_list[j].RemoveAll();
+                phone = doc.CreateElement("phone");
+                Type = doc.CreateAttribute("Type");
+                addresses = doc.CreateElement("addresses");
+                address = doc.CreateElement("address");
+                street = doc.CreateElement("street");
+                buildingNumber = doc.CreateElement("buldingNumber");
+                region = doc.CreateElement("region");
+                city = doc.CreateElement("city");
+                country = doc.CreateElement("country");
+                for (int i=0;i<listBox_home.Items.Count;i++)
+                {
+                    Type.InnerText = "home";
+                    phones_list[j].AppendChild(phone);
+                    phone.Attributes.Append(Type);
+                    phone.InnerText = listBox_home.Items[i].ToString();
+                    doc.Save(path);
+                }
+                for (int i = 0; i < listBox_mobile.Items.Count; i++)
+                {
+                    Type.InnerText = "mobile";
+                    phones_list[j].AppendChild(phone);
+                    phone.Attributes.Append(Type);
+                    phone.InnerText = listBox_mobile.Items[i].ToString();
+                    doc.Save(path);
+                }
 
-			}
-		}
+
+                addresses_list = doc.GetElementsByTagName("addresses");
+                address_list = addresses_list[j].ChildNodes;
+                addresses_list[j].RemoveAll();
+
+
+              
+             doc.Save(path);
+                }
+                
+
+            }
+		
 
 		private void button_done_Click(object sender, EventArgs e)
 		{
@@ -208,13 +277,45 @@ namespace employee
 				case ("street"):
 					listBox_street.Items[index] = textBox_edit.Text;
 					listBox_street.SelectedIndex = listBox_street.Items.IndexOf(textBox_edit.Text);
-					//listBox_street.Refresh();
+                    flag = "";
 					break;
 				case ("region"):
-					listBox_region.Items[0] = textBox_edit.Text;
-					textBox_edit.Text = "";
-					break;
-			}
+					listBox_region.Items[index] = textBox_edit.Text;
+                    listBox_region.SelectedIndex = listBox_region.Items.IndexOf(textBox_edit.Text);
+                    textBox_edit.Text = "";
+                    flag = "";
+                    break;
+                case ("bulding_no"):
+                    listBox_no.Items[index] = textBox_edit.Text;
+                    listBox_no.SelectedIndex = listBox_no.Items.IndexOf(textBox_edit.Text);
+                    textBox_edit.Text = "";
+                    flag = "";
+                    break;
+                case ("city"):
+                    listBox_city.Items[index] = textBox_edit.Text;
+                    listBox_city.SelectedIndex = listBox_city.Items.IndexOf(textBox_edit.Text);
+                    textBox_edit.Text = "";
+                    flag = "";
+                    break;
+                case ("country"):
+                    listBox_country.Items[index] = textBox_edit.Text;
+                    listBox_country.SelectedIndex = listBox_country.Items.IndexOf(textBox_edit.Text);
+                    textBox_edit.Text = "";
+                    flag = "";
+                    break;
+                case ("mobile"):
+                    listBox_mobile.Items[index] = textBox_edit.Text;
+                    listBox_mobile.SelectedIndex = listBox_mobile.Items.IndexOf(textBox_edit.Text);
+                    textBox_edit.Text = "";
+                    flag = "";
+                    break;
+                case ("home"):
+                    listBox_home.Items[index] = textBox_edit.Text;
+                    listBox_home.SelectedIndex = listBox_home.Items.IndexOf(textBox_edit.Text);
+                    textBox_edit.Text = "";
+                    flag = "";
+                    break;
+            }
 		}
 
 		private void listBox_street_SelectedIndexChanged(object sender, EventArgs e)
@@ -224,49 +325,67 @@ namespace employee
 				flag = "street";
 				textBox_edit.Text = listBox_street.SelectedItem.ToString();
 				index = listBox_street.SelectedIndex;
-				//textBox_edit.Text = listBox_street.Items[index].ToString();
 				
 			}
 		}
 
-		private void listBox_no_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			flag = "bulding_no";
-			textBox_edit.Text = listBox_no.SelectedItem.ToString();
-
+        private void listBox_no_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (flag != "bulding_no")
+            { 
+            flag = "bulding_no";
+            index = listBox_no.SelectedIndex;
+            textBox_edit.Text = listBox_no.SelectedItem.ToString();
+            }
 		}
 
 		private void listBox_region_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			flag = "region";
-			textBox_edit.Text = listBox_region.SelectedItem.ToString();
-		
+            if (flag != "region")
+            {
+                flag = "region";
+                index = listBox_region.SelectedIndex;
+                textBox_edit.Text = listBox_region.SelectedItem.ToString();
+            }
 		}
 
-		private void listBox_city_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			flag = "city";
-			textBox_edit.Text = listBox_city.SelectedItem.ToString();
-		}
+        private void listBox_city_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (flag != "city")
+            {
+                flag = "city";
+                index = listBox_city.SelectedIndex;
+                textBox_edit.Text = listBox_city.SelectedItem.ToString();
+            }
+        }
+        private void listBox_country_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (flag != "country")
+            {
+                flag = "country";
+                index = listBox_country.SelectedIndex;
+                textBox_edit.Text = listBox_country.SelectedItem.ToString();
+            }
+        }
+        private void listBox_mobile_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (flag != "mobile")
+            {
+                flag = "mobile";
+                index = listBox_mobile.SelectedIndex;
+                textBox_edit.Text = listBox_mobile.SelectedItem.ToString();
+            }
+        }
 
-		private void listBox_country_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			flag = "country";
-			textBox_edit.Text = listBox_country.SelectedItem.ToString();
-		}
-
-		private void listBox_mobile_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			flag = "mobile";
-			textBox_edit.Text = listBox_mobile.SelectedItem.ToString();
-		}
-
-		private void listBox_home_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			flag = "home";
-			textBox_edit.Text = listBox_home.SelectedItem.ToString();
-		}
-
+        private void listBox_home_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (flag != "home")
+            {
+                flag = "home";
+                index = listBox_home.SelectedIndex;
+                textBox_edit.Text = listBox_home.SelectedItem.ToString();
+            }
+        }
 		private void button_cancel_Click(object sender, EventArgs e)
 		{
 			button_update.Text = "update";
@@ -277,14 +396,21 @@ namespace employee
 			textBox_edit.Visible = false;
 			label_edit.Visible = false;
 			button_done.Visible = false;
+            button_prev.Enabled = true;
+            button_update.Enabled = true;
+            button_next.Enabled = true;
+            button_insert.Enabled = true;
+            button_del.Enabled = true;
+            button_search.Enabled = true;
 		}
 
 		private void button_insert_Click_1(object sender, EventArgs e)
 		{
-		
+            int id = name_list.Count + 1;
 			panel_insert.Visible = true;
 			if (button_insert.Text == "insert")
 			{
+
 				button_update.Enabled = false;
 				button_search.Enabled = false;
 				button_prev.Enabled = false;
@@ -297,6 +423,7 @@ namespace employee
 				textBox_mail.ReadOnly = false;
 
 				employee = doc.CreateElement("employee");
+                emp_id = doc.CreateAttribute("id");
 				name = doc.CreateElement("name");
 				phones = doc.CreateElement("phones");
 				phone = doc.CreateElement("phone");
@@ -329,6 +456,8 @@ namespace employee
 				button_del.Enabled = true;
 				
 				root.AppendChild(employee);
+                emp_id.InnerText = id.ToString();
+                employee.Attributes.Append(emp_id);
 				employee.AppendChild(name);
 				if (textBox_name.Text !="")
 				{
@@ -402,12 +531,12 @@ namespace employee
 				}
 				if (richTextBox_no.Text != "")
 				{
-					buildingNumber = doc.CreateElement("buldingNo");
+					buildingNumber = doc.CreateElement("buldingNumber");
 					buildingNumber.InnerText = richTextBox_no.Text;
 				}
 				else
 				{
-					buildingNumber = doc.CreateElement("buldingNo");
+					buildingNumber = doc.CreateElement("buldingNumber");
 					buildingNumber.InnerText = "_";
 				}
 				if (richTextBox_city.Text != "")
@@ -584,7 +713,67 @@ namespace employee
 			richTextBox_city.Text = "";
 			richTextBox_country.Text = "";
 		}
-	}
+
+
+
+		private void button_view1_Click(object sender, EventArgs e)
+		{
+			XslCompiledTransform xslt = new XslCompiledTransform();
+			xslt.Load("contacts.xsl");
+			xslt.Transform("contacts.xml", "contacts.html");
+			System.Diagnostics.Process.Start("contacts.html");
+
+			
+		}
+
+
+
+		private void button_view2_Click_1(object sender, EventArgs e)
+		{
+			
+				XslCompiledTransform xslt = new XslCompiledTransform();
+				xslt.Load("contacts1.xsl");
+				xslt.Transform("contacts.xml", "contacts1.html");
+				System.Diagnostics.Process.Start("contacts1.html");
+		
+		}
+
+		private void button_view3_Click(object sender, EventArgs e)
+		{
+			XslCompiledTransform xslt = new XslCompiledTransform();
+			xslt.Load("contacts2.xsl");
+			xslt.Transform("contacts.xml", "contacts2.html");
+			System.Diagnostics.Process.Start("contacts2.html");
+		}
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            string xml_data = doc.InnerXml;
+            string connection = @"Data Source=MADONNA-PC\MADONNA;Initial Catalog=contacts;Integrated Security=True";
+            SqlConnection con = new SqlConnection(connection);
+            SqlCommand cmd = new SqlCommand("xmlsave", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@doc",xml_data);
+            con.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        private void button_search_Click(object sender, EventArgs e)
+        {
+            searchDialgueBox dg = new searchDialgueBox();
+            DialogResult d = dg.ShowDialog();
+            if (d==DialogResult.OK)
+            {
+                j = int.Parse(dg.Id)-1;
+                fill_function();
+                if(j!=0)
+                {
+                    button_prev.Enabled = true;
+                }
+
+            }
+        }
+    }
 }
 
 
