@@ -239,6 +239,14 @@ namespace employee
                 region = doc.CreateElement("region");
                 city = doc.CreateElement("city");
                 country = doc.CreateElement("country");
+                foreach (var item in listBox_home.Items)
+                {
+                    Type.InnerText = "home";
+                    phones_list[j].AppendChild(phone);
+                    phone.Attributes.Append(Type);
+                    phone.InnerText = item.ToString();
+                    doc.Save(path);
+                }
                 for (int i=0;i<listBox_home.Items.Count;i++)
                 {
                     Type.InnerText = "home";
@@ -257,9 +265,9 @@ namespace employee
                 }
 
 
-                addresses_list = doc.GetElementsByTagName("addresses");
-                address_list = addresses_list[j].ChildNodes;
-                addresses_list[j].RemoveAll();
+                //addresses_list = doc.GetElementsByTagName("addresses");
+                //address_list = addresses_list[j].ChildNodes;
+                //addresses_list[j].RemoveAll();ww
 
 
               
@@ -760,18 +768,28 @@ namespace employee
 
         private void button_search_Click(object sender, EventArgs e)
         {
+            
             searchDialgueBox dg = new searchDialgueBox();
             DialogResult d = dg.ShowDialog();
+            
             if (d==DialogResult.OK)
             {
-                j = int.Parse(dg.Id)-1;
-                fill_function();
-                if(j!=0)
+                if (int.Parse(dg.Id) <= name_list.Count)
                 {
-                    button_prev.Enabled = true;
+                    j = int.Parse(dg.Id) - 1;
+                    empty_form();
+                    fill_function();
+                    if (j != 0)
+                    {
+                        button_prev.Enabled = true;
+                    }
                 }
-
+                else
+                {
+                    MessageBox.Show("not found id");
+                }
             }
+ 
         }
     }
 }
